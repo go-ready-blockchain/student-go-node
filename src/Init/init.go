@@ -1,13 +1,14 @@
 package Init
 
 import (
-	"bytes"
+	
 	"fmt"
-	"net/http"
+	
 
 	"github.com/jugalw13/student-go-node/blockchain"
 	"github.com/jugalw13/student-go-node/security"
 	"github.com/jugalw13/student-go-node/student"
+	"github.com/jugalw13/student-go-node/utils"
 )
 
 func InitializeBlockChain() {
@@ -31,30 +32,11 @@ func InitStudentNode(usn string, branch string, name string, gender string, dob 
 	security.GenerateStudentKeys(usn)
 
 	stud := student.EnterStudentData(usn, branch, name, gender, dob, perc10th, perc12th, cgpa, backlog, email, mobile, staroffer)
+	fmt.Println(stud)
 
-	StoreStudentDataInDb(student.EncodeToBytes(stud))
+	utils.StoreStudentData(usn, branch, name, gender, dob, perc10th, perc12th, cgpa, backlog, email, mobile, staroffer)
 
-}
-
-func StoreStudentDataInDb(jsonbytes []byte) bool {
-
-	url := "https://hn86a2dvf0.execute-api.us-east-1.amazonaws.com/default/blockchaindb"
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonbytes))
-	req.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-
-	if resp.Status == "200 OK" {
-		fmt.Println("Student successfully added to DB!")
-		return true
-	}
-
-	fmt.Println("Student Failed to add to DB!")
-	return false
+	//StoreStudentDataInDb(student.EncodeToBytes(stud))
 
 }
+

@@ -88,7 +88,7 @@ func callAcademicDeptVerification(name string, company string) {
 	if err != nil {
 		print(err)
 	}
-	resp, err := http.Post("http://localhost:5003/verify-AcademicDept",
+	resp, err := http.Post("http://academic-consensus-go-final.apps.us-east-1.starter.openshift-online.com/verify-AcademicDept",
 		"application/json", bytes.NewBuffer(reqBody))
 	if err != nil {
 		print(err)
@@ -111,7 +111,7 @@ func callprintUsage(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	port := "5001"
+	port := "8080"
 	http.HandleFunc("/student", calladdStudent)
 	http.HandleFunc("/handlerequest", callrequestBlock)
 	http.HandleFunc("/usage", callprintUsage)
