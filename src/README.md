@@ -1,6 +1,6 @@
 # Blockchain Implementation in GoLang For Placement System
 
-## Proof of Work is the Consensus Algorithm used in our BlockChain Implementation
+## Student Node
 
 ### Run `go run main.go` to run the app, run `go build main.go` to build an executable file.
 
