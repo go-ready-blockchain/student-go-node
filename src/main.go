@@ -59,7 +59,34 @@ func requestBlock(name string, company string) {
 	fmt.Println("Requested Block Initialized!")
 }
 
-func callrequestBlock(w http.ResponseWriter, r *http.Request) {
+func handlerequest(w http.ResponseWriter, r *http.Request) {
+	type jsonBody struct {
+		Approval bool   `json:"approval"`
+		Name     string `json:"name"`
+		Company  string `json:"company"`
+	}
+	decoder := json.NewDecoder(r.Body)
+	var b jsonBody
+	if err := decoder.Decode(&b); err != nil {
+		log.Fatal(err)
+	}
+	if !b.Approval {
+		fmt.Println("Student :", b.Name, "Rejected Request for Data for Company: ", b.Company)
+		w.Write([]byte(string("Student : " + b.Name + " Rejected Request for Data for Company: " + b.Company)))
+		return
+	}
+	requestBlock(b.Name, b.Company)
+
+	message := "Requested Block Initialized!"
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(message))
+
+	fmt.Println("\n\nSending Notification to Academic Dept for Verification\n\n")
+	callAcademicDeptVerification(b.Name, b.Company)
+
+}
+
+func test_request(w http.ResponseWriter, r *http.Request) {
 	type jsonBody struct {
 		Name    string `json:"name"`
 		Company string `json:"company"`
@@ -113,7 +140,8 @@ func callprintUsage(w http.ResponseWriter, r *http.Request) {
 func main() {
 	port := "8081"
 	http.HandleFunc("/student", calladdStudent)
-	http.HandleFunc("/handlerequest", callrequestBlock)
+	http.HandleFunc("/handlerequest", handlerequest)
+	http.HandleFunc("/test_request", test_request)
 	http.HandleFunc("/usage", callprintUsage)
 	fmt.Printf("Server listening on localhost:%s\n", port)
 	http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
