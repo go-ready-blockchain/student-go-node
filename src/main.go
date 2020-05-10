@@ -18,7 +18,7 @@ func printUsage() {
 	fmt.Println("student -usn USN -branch BRANCH -name NAME -gender GENDER -dob DOB -perc10th PERC10TH -perc12th PERC12TH -cgpa CGPA -backlog BACKLOG -email EMAIL -mobile MOBILE -staroffer STAROFFER\tTo Add a New Student")
 }
 
-func addStudent(usn string, branch string, name string, gender string, dob string, perc10th string, perc12th string, cgpa string, backlog bool, email string, mobile string, staroffer bool) {
+func addStudent(usn string, branch string, name string, gender string, dob string, perc10th float32, perc12th float32, cgpa float32, backlog bool, email string, mobile string, staroffer bool) {
 	fmt.Println("\nInitializing new Student\n")
 	Init.InitStudentNode(usn, branch, name, gender, dob, perc10th, perc12th, cgpa, backlog, email, mobile, staroffer)
 	fmt.Println("Student Added!")
@@ -27,18 +27,18 @@ func addStudent(usn string, branch string, name string, gender string, dob strin
 
 func calladdStudent(w http.ResponseWriter, r *http.Request) {
 	type jsonBody struct {
-		Usn       string `json:"Usn"`
-		Branch    string `json:"Branch"`
-		Name      string `json:"Name"`
-		Gender    string `json:"Gender"`
-		Dob       string `json:"Dob"`
-		Perc10th  string `json:"Perc10th"`
-		Perc12th  string `json:"Perc12th"`
-		Cgpa      string `json:"Cgpa"`
-		Backlog   bool   `json:"Backlog"`
-		Email     string `json:"Email"`
-		Mobile    string `json:"Mobile"`
-		StarOffer bool   `json:"StarOffer"`
+		Usn       string  `json:"Usn"`
+		Branch    string  `json:"Branch"`
+		Name      string  `json:"Name"`
+		Gender    string  `json:"Gender"`
+		Dob       string  `json:"Dob"`
+		Perc10th  float32 `json:"Perc10th"`
+		Perc12th  float32 `json:"Perc12th"`
+		Cgpa      float32 `json:"Cgpa"`
+		Backlog   bool    `json:"Backlog"`
+		Email     string  `json:"Email"`
+		Mobile    string  `json:"Mobile"`
+		StarOffer bool    `json:"StarOffer"`
 	}
 	decoder := json.NewDecoder(r.Body)
 	var b jsonBody
