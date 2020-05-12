@@ -7,9 +7,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 
-	"github.com/jugalw13/student-go-node/Init"
-	"github.com/jugalw13/student-go-node/blockchain"
+	"github.com/go-ready-blockchain/blockchain-go-core/Init"
+	"github.com/go-ready-blockchain/blockchain-go-core/blockchain"
 )
 
 func printUsage() {
@@ -18,7 +19,7 @@ func printUsage() {
 	fmt.Println("student -usn USN -branch BRANCH -name NAME -gender GENDER -dob DOB -perc10th PERC10TH -perc12th PERC12TH -cgpa CGPA -backlog BACKLOG -email EMAIL -mobile MOBILE -staroffer STAROFFER\tTo Add a New Student")
 }
 
-func addStudent(usn string, branch string, name string, gender string, dob string, perc10th string, perc12th string, cgpa string, backlog bool, email string, mobile string, staroffer bool) {
+func addStudent(usn string, branch string, name string, gender string, dob string, perc10th float32, perc12th float32, cgpa float32, backlog bool, email string, mobile string, staroffer bool) {
 	fmt.Println("\nInitializing new Student\n")
 	Init.InitStudentNode(usn, branch, name, gender, dob, perc10th, perc12th, cgpa, backlog, email, mobile, staroffer)
 	fmt.Println("Student Added!")
@@ -27,18 +28,18 @@ func addStudent(usn string, branch string, name string, gender string, dob strin
 
 func calladdStudent(w http.ResponseWriter, r *http.Request) {
 	type jsonBody struct {
-		Usn       string `json:"Usn"`
-		Branch    string `json:"Branch"`
-		Name      string `json:"Name"`
-		Gender    string `json:"Gender"`
-		Dob       string `json:"Dob"`
-		Perc10th  string `json:"Perc10th"`
-		Perc12th  string `json:"Perc12th"`
-		Cgpa      string `json:"Cgpa"`
-		Backlog   bool   `json:"Backlog"`
-		Email     string `json:"Email"`
-		Mobile    string `json:"Mobile"`
-		StarOffer bool   `json:"StarOffer"`
+		Usn       string  `json:"Usn"`
+		Branch    string  `json:"Branch"`
+		Name      string  `json:"Name"`
+		Gender    string  `json:"Gender"`
+		Dob       string  `json:"Dob"`
+		Perc10th  float32 `json:"Perc10th"`
+		Perc12th  float32 `json:"Perc12th"`
+		Cgpa      float32 `json:"Cgpa"`
+		Backlog   bool    `json:"Backlog"`
+		Email     string  `json:"Email"`
+		Mobile    string  `json:"Mobile"`
+		StarOffer bool    `json:"StarOffer"`
 	}
 	decoder := json.NewDecoder(r.Body)
 	var b jsonBody
@@ -59,7 +60,37 @@ func requestBlock(name string, company string) {
 	fmt.Println("Requested Block Initialized!")
 }
 
-func callrequestBlock(w http.ResponseWriter, r *http.Request) {
+func handlerequest(w http.ResponseWriter, r *http.Request) {
+	type jsonBody struct {
+		Approval bool   `json:"approval"`
+		Name     string `json:"name"`
+		Company  string `json:"company"`
+	}
+
+	decoder := r.URL.Query()
+	approval := decoder["approval"][0]
+	Approval, _ := strconv.ParseBool(approval)
+	Company := decoder["company"][0]
+	Name := decoder["name"][0]
+	fmt.Println(Approval, Company)
+
+	if !Approval {
+		fmt.Println("Student :", Name, "Rejected Request for Data for Company: ", Company)
+		w.Write([]byte(string("Student : " + Name + " Rejected Request for Data for Company: " + Company)))
+		return
+	}
+	requestBlock(Name, Company)
+
+	message := "Requested Block Initialized!"
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(message))
+
+	fmt.Println("\n\nSending Notification to Academic Dept for Verification\n\n")
+	callAcademicDeptVerification(Name, Company)
+
+}
+
+func test_request(w http.ResponseWriter, r *http.Request) {
 	type jsonBody struct {
 		Name    string `json:"name"`
 		Company string `json:"company"`
@@ -88,7 +119,7 @@ func callAcademicDeptVerification(name string, company string) {
 	if err != nil {
 		print(err)
 	}
-	resp, err := http.Post("http://academic-consensus-go-final.apps.us-east-1.starter.openshift-online.com/verify-AcademicDept",
+	resp, err := http.Post("http://localhost:8083/verify-AcademicDept",
 		"application/json", bytes.NewBuffer(reqBody))
 	if err != nil {
 		print(err)
@@ -111,9 +142,10 @@ func callprintUsage(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	port := "8080"
+	port := "8081"
 	http.HandleFunc("/student", calladdStudent)
-	http.HandleFunc("/handlerequest", callrequestBlock)
+	http.HandleFunc("/handlerequest", handlerequest)
+	http.HandleFunc("/test_request", test_request)
 	http.HandleFunc("/usage", callprintUsage)
 	fmt.Printf("Server listening on localhost:%s\n", port)
 	http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
