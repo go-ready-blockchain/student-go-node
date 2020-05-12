@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/go-ready-blockchain/blockchain-go-core/Init"
 	"github.com/go-ready-blockchain/blockchain-go-core/blockchain"
@@ -65,24 +66,27 @@ func handlerequest(w http.ResponseWriter, r *http.Request) {
 		Name     string `json:"name"`
 		Company  string `json:"company"`
 	}
-	decoder := json.NewDecoder(r.Body)
-	var b jsonBody
-	if err := decoder.Decode(&b); err != nil {
-		log.Fatal(err)
-	}
-	if !b.Approval {
-		fmt.Println("Student :", b.Name, "Rejected Request for Data for Company: ", b.Company)
-		w.Write([]byte(string("Student : " + b.Name + " Rejected Request for Data for Company: " + b.Company)))
+
+	decoder := r.URL.Query()
+	approval := decoder["approval"][0]
+	Approval, _ := strconv.ParseBool(approval)
+	Company := decoder["company"][0]
+	Name := decoder["name"][0]
+	fmt.Println(Approval, Company)
+
+	if !Approval {
+		fmt.Println("Student :", Name, "Rejected Request for Data for Company: ", Company)
+		w.Write([]byte(string("Student : " + Name + " Rejected Request for Data for Company: " + Company)))
 		return
 	}
-	requestBlock(b.Name, b.Company)
+	requestBlock(Name, Company)
 
 	message := "Requested Block Initialized!"
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(message))
 
 	fmt.Println("\n\nSending Notification to Academic Dept for Verification\n\n")
-	callAcademicDeptVerification(b.Name, b.Company)
+	callAcademicDeptVerification(Name, Company)
 
 }
 
