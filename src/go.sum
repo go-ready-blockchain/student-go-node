@@ -4,6 +4,8 @@ github.com/aws/aws-sdk-go v1.30.9 h1:DntpBUKkchINPDbhEzDRin1eEn1TG9TZFlzWPf0i8to
 github.com/aws/aws-sdk-go v1.30.9/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
 github.com/aws/aws-sdk-go v1.30.11 h1:bJoa1QGyyAV4COx1SXpf+LElFVVnOreG6KM0jIxwZq0=
 github.com/aws/aws-sdk-go v1.30.11/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
+github.com/aws/aws-sdk-go v1.30.29 h1:NXNqBS9hjOCpDL8SyCyl38gZX3LLLunKOJc5E7vJ8P0=
+github.com/aws/aws-sdk-go v1.30.29/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dgraph-io/badger v1.5.4 h1:gVTrpUTbbr/T24uvoCaqY2KSHfNLVGm0w+hbee2HMeg=
 github.com/dgraph-io/badger v1.5.4/go.mod h1:VZxzAIRPHRVNRKRo6AXrX9BJegn6il06VMTZVJYCIjQ=
@@ -14,6 +16,10 @@ github.com/go-ready-blockchain/blockchain-go-core v0.0.0-20200508173507-d5a599ef
 github.com/go-ready-blockchain/blockchain-go-core v0.0.0-20200508173507-d5a599efda93/go.mod h1:dJvb5+Tc/m2+3rlfnbYKqTa6GTZWkwUvme4y/aBglHI=
 github.com/go-ready-blockchain/blockchain-go-core v0.0.0-20200511185950-c669065eb254 h1:cWiIUhOp8sm6WpEKYGnaYJkKujskHRc+Wj1NTFnySuw=
 github.com/go-ready-blockchain/blockchain-go-core v0.0.0-20200511185950-c669065eb254/go.mod h1:WcwpUYjdxad3E87W9UJ97hHPPYOtPk5U7+U1CVtSNe8=
+github.com/go-ready-blockchain/blockchain-go-core v0.0.0-20200512190952-421166cb54bb h1:NzLMxra96/8OQ3qc+V65RDQYl0fboNVxVu3kn9Tq5UY=
+github.com/go-ready-blockchain/blockchain-go-core v0.0.0-20200512190952-421166cb54bb/go.mod h1:WcwpUYjdxad3E87W9UJ97hHPPYOtPk5U7+U1CVtSNe8=
+github.com/go-ready-blockchain/blockchain-go-core v0.0.0-20200517222535-5fc9ad58d947 h1:SGmOYyrz9lFMvbazzL+v3QOHjBxRGjHE/oFnuVH7ZdQ=
+github.com/go-ready-blockchain/blockchain-go-core v0.0.0-20200517222535-5fc9ad58d947/go.mod h1:WcwpUYjdxad3E87W9UJ97hHPPYOtPk5U7+U1CVtSNe8=
 github.com/go-sql-driver/mysql v1.5.0/go.mod h1:DCzpHaOWr8IXmIStZouvnhqoel9Qv2LBy8hT2VhHyBg=
 github.com/golang/protobuf v1.2.0 h1:P3YflyNX/ehuJFLhxviNdFxQPkGK5cDcApsge1SqnvM=
 github.com/golang/protobuf v1.2.0/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=

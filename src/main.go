@@ -11,6 +11,7 @@ import (
 
 	"github.com/go-ready-blockchain/blockchain-go-core/Init"
 	"github.com/go-ready-blockchain/blockchain-go-core/blockchain"
+	"github.com/go-ready-blockchain/blockchain-go-core/logger"
 )
 
 func printUsage() {
@@ -61,6 +62,9 @@ func requestBlock(name string, company string) {
 }
 
 func handlerequest(w http.ResponseWriter, r *http.Request) {
+	name := "Student.log"
+	logger.FileName = name
+	
 	type jsonBody struct {
 		Approval bool   `json:"approval"`
 		Name     string `json:"name"`
@@ -108,7 +112,6 @@ func test_request(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("\n\nSending Notification to Academic Dept for Verification\n\n")
 	callAcademicDeptVerification(b.Name, b.Company)
-
 }
 
 func callAcademicDeptVerification(name string, company string) {
@@ -133,7 +136,7 @@ func callAcademicDeptVerification(name string, company string) {
 }
 
 func callprintUsage(w http.ResponseWriter, r *http.Request) {
-
+	
 	printUsage()
 
 	w.Header().Set("Content-Type", "application/json")
@@ -143,6 +146,7 @@ func callprintUsage(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	port := "8081"
+	logger.NodeName = "Student"
 	http.HandleFunc("/student", calladdStudent)
 	http.HandleFunc("/handlerequest", handlerequest)
 	http.HandleFunc("/test_request", test_request)
