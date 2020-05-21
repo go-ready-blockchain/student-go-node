@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/go-ready-blockchain/blockchain-go-core/Init"
 	"github.com/go-ready-blockchain/blockchain-go-core/blockchain"
@@ -28,6 +29,11 @@ func addStudent(usn string, branch string, name string, gender string, dob strin
 }
 
 func calladdStudent(w http.ResponseWriter, r *http.Request) {
+	name := time.Now().String()
+	logger.FileName = "Add Student" + name + ".log"
+	logger.NodeName = "Student Node"
+	logger.CreateFile()
+
 	type jsonBody struct {
 		Usn       string  `json:"Usn"`
 		Branch    string  `json:"Branch"`
@@ -48,6 +54,10 @@ func calladdStudent(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
+	logger.UploadToS3Bucket(logger.NodeName)
+
+	logger.DeleteFile()
+
 	addStudent(b.Usn, b.Branch, b.Name, b.Gender, b.Dob, b.Perc10th, b.Perc12th, b.Cgpa, b.Backlog, b.Email, b.Mobile, b.StarOffer)
 
 	message := "Student Added!"
@@ -62,9 +72,11 @@ func requestBlock(name string, company string) {
 }
 
 func handlerequest(w http.ResponseWriter, r *http.Request) {
-	name := "Student.log"
-	logger.FileName = name
-	
+	name := time.Now().String()
+	logger.FileName = "Handle Student Request" + name + ".log"
+	logger.NodeName = "Student Node"
+	logger.CreateFile()
+
 	type jsonBody struct {
 		Approval bool   `json:"approval"`
 		Name     string `json:"name"`
@@ -79,11 +91,18 @@ func handlerequest(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(Approval, Company)
 
 	if !Approval {
+		logger.UploadToS3Bucket(logger.NodeName)
+
+		logger.DeleteFile()
 		fmt.Println("Student :", Name, "Rejected Request for Data for Company: ", Company)
 		w.Write([]byte(string("Student : " + Name + " Rejected Request for Data for Company: " + Company)))
 		return
 	}
 	requestBlock(Name, Company)
+
+	logger.UploadToS3Bucket(logger.NodeName)
+
+	logger.DeleteFile()
 
 	message := "Requested Block Initialized!"
 	w.Header().Set("Content-Type", "application/json")
@@ -136,7 +155,7 @@ func callAcademicDeptVerification(name string, company string) {
 }
 
 func callprintUsage(w http.ResponseWriter, r *http.Request) {
-	
+
 	printUsage()
 
 	w.Header().Set("Content-Type", "application/json")
@@ -146,7 +165,6 @@ func callprintUsage(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	port := "8081"
-	logger.NodeName = "Student"
 	http.HandleFunc("/student", calladdStudent)
 	http.HandleFunc("/handlerequest", handlerequest)
 	http.HandleFunc("/test_request", test_request)
