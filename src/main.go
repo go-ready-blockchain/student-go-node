@@ -17,8 +17,9 @@ import (
 
 func printUsage() {
 	fmt.Println("Usage:")
-	fmt.Println("handlerequest -company COMPANY -student USN \tCompany requests for Student's Data")
-	fmt.Println("student -usn USN -branch BRANCH -name NAME -gender GENDER -dob DOB -perc10th PERC10TH -perc12th PERC12TH -cgpa CGPA -backlog BACKLOG -email EMAIL -mobile MOBILE -staroffer STAROFFER\tTo Add a New Student")
+	fmt.Println("Make POST request to /student \tTo Add a New Student")
+	fmt.Println("Make GET request to /handlerequest \tHandle Request and Initiate Creation of Request Block")
+	fmt.Println("Make POST request to /request-student \t Test Direct Request to Student")
 }
 
 func addStudent(usn string, branch string, name string, gender string, dob string, perc10th float32, perc12th float32, cgpa float32, backlog bool, email string, mobile string, staroffer bool) {
@@ -113,7 +114,7 @@ func handlerequest(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func test_request(w http.ResponseWriter, r *http.Request) {
+func request_student(w http.ResponseWriter, r *http.Request) {
 	type jsonBody struct {
 		Name    string `json:"name"`
 		Company string `json:"company"`
@@ -167,7 +168,7 @@ func main() {
 	port := "8081"
 	http.HandleFunc("/student", calladdStudent)
 	http.HandleFunc("/handlerequest", handlerequest)
-	http.HandleFunc("/test_request", test_request)
+	http.HandleFunc("/request-student", request_student)
 	http.HandleFunc("/usage", callprintUsage)
 	fmt.Printf("Server listening on localhost:%s\n", port)
 	http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
