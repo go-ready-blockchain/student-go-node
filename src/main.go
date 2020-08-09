@@ -9,10 +9,10 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"os"
 
 	"github.com/go-ready-blockchain/blockchain-go-core/Init"
 	"github.com/go-ready-blockchain/blockchain-go-core/blockchain"
-	"github.com/go-ready-blockchain/blockchain-go-core/logger"
 )
 
 func printUsage() {
@@ -30,10 +30,10 @@ func addStudent(usn string, branch string, name string, gender string, dob strin
 }
 
 func calladdStudent(w http.ResponseWriter, r *http.Request) {
-	name := time.Now().String()
-	logger.FileName = "Add Student" + name + ".log"
-	logger.NodeName = "Student Node"
-	logger.CreateFile()
+	//name := time.Now().String()
+	//logger.FileName = "Add Student" + name + ".log"
+	//logger.NodeName = "Student Node"
+	//logger.CreateFile()
 
 	type jsonBody struct {
 		Usn       string  `json:"Usn"`
@@ -55,9 +55,9 @@ func calladdStudent(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	logger.UploadToS3Bucket(logger.NodeName)
+	////logger.UploadToS3Bucket(//logger.NodeName)
 
-	logger.DeleteFile()
+	//logger.DeleteFile()
 
 	addStudent(b.Usn, b.Branch, b.Name, b.Gender, b.Dob, b.Perc10th, b.Perc12th, b.Cgpa, b.Backlog, b.Email, b.Mobile, b.StarOffer)
 
@@ -66,17 +66,19 @@ func calladdStudent(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(message))
 }
 
-func requestBlock(name string, company string) {
+func requestBlock(name string, company string, done chan bool) {
 	fmt.Println("\nCreating the requested block\n")
 	blockchain.InitBlockInBuffer(name, company)
 	fmt.Println("Requested Block Initialized!")
+	time.Sleep(10*time.Second)
+	done <- true
 }
 
 func handlerequest(w http.ResponseWriter, r *http.Request) {
-	name := time.Now().String()
-	logger.FileName = "Handle Student Request" + name + ".log"
-	logger.NodeName = "Student Node"
-	logger.CreateFile()
+	//name := time.Now().String()
+	//logger.FileName = "Handle Student Request" + name + ".log"
+	//logger.NodeName = "Student Node"
+	//logger.CreateFile()
 
 	type jsonBody struct {
 		Approval bool   `json:"approval"`
@@ -92,25 +94,30 @@ func handlerequest(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(Approval, Company)
 
 	if !Approval {
-		logger.UploadToS3Bucket(logger.NodeName)
+		//logger.UploadToS3Bucket(//logger.NodeName)
 
-		logger.DeleteFile()
+		//logger.DeleteFile()
 		fmt.Println("Student :", Name, "Rejected Request for Data for Company: ", Company)
 		w.Write([]byte(string("Student : " + Name + " Rejected Request for Data for Company: " + Company)))
 		return
 	}
-	requestBlock(Name, Company)
+	done := make(chan bool, 1)
+	go requestBlock(Name, Company ,done)
 
-	logger.UploadToS3Bucket(logger.NodeName)
+	//logger.UploadToS3Bucket(//logger.NodeName)
 
-	logger.DeleteFile()
+	//logger.DeleteFile()
 
 	message := "Requested Block Initialized!"
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(message))
 
 	fmt.Println("\n\nSending Notification to Academic Dept for Verification\n\n")
-	callAcademicDeptVerification(Name, Company)
+	x := <-done
+	fmt.Println(x)
+	if x == true{
+		callAcademicDeptVerification(Name, Company)
+	} 
 
 }
 
@@ -124,14 +131,21 @@ func request_student(w http.ResponseWriter, r *http.Request) {
 	if err := decoder.Decode(&b); err != nil {
 		log.Fatal(err)
 	}
-	requestBlock(b.Name, b.Company)
+    done := make(chan bool, 1)
+	go requestBlock(b.Name, b.Company, done)
 
 	message := "Requested Block Initialized!"
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(message))
 
 	fmt.Println("\n\nSending Notification to Academic Dept for Verification\n\n")
-	callAcademicDeptVerification(b.Name, b.Company)
+	x := <-done
+	fmt.Println(x)
+	if x == true{
+		callAcademicDeptVerification(b.Name, b.Company)
+
+	}
+	
 }
 
 func callAcademicDeptVerification(name string, company string) {
@@ -142,7 +156,10 @@ func callAcademicDeptVerification(name string, company string) {
 	if err != nil {
 		print(err)
 	}
-	resp, err := http.Post("http://localhost:8083/verify-AcademicDept",
+	Apiurl := os.Getenv("ACADEMIC_DEPT_URL")
+	Apiurl = Apiurl + "/verify-AcademicDept"
+	
+	resp, err := http.Post(Apiurl,
 		"application/json", bytes.NewBuffer(reqBody))
 	if err != nil {
 		print(err)
@@ -160,12 +177,14 @@ func callprintUsage(w http.ResponseWriter, r *http.Request) {
 	printUsage()
 
 	w.Header().Set("Content-Type", "application/json")
+	
 	message := "Printed Usage!!"
+
 	w.Write([]byte(message))
 }
 
 func main() {
-	port := "8081"
+	port := "8080"
 	http.HandleFunc("/student", calladdStudent)
 	http.HandleFunc("/handlerequest", handlerequest)
 	http.HandleFunc("/request-student", request_student)
